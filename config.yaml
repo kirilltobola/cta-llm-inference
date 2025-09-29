@@ -1,0 +1,21 @@
+---
+model_name: "Qwen/Qwen2.5-3B-Instruct"
+model_short_name: "qwen25" # to save inference resluts, avoid `/` symbols
+
+labels_path: "sem_types.csv"
+labels_column: "label"
+
+dataset:
+  path: "sti-team/rwt-rutabert"
+  data_column: "column_data"
+  label_column: "label"
+  split: "test"
+
+dataloader:
+  batch_size: 64
+  shuffle: True
+
+optim:
+  use_quantization: True
+  load_in_4bit: False
+  load_in_8bit: True
