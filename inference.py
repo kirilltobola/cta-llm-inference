@@ -5,7 +5,6 @@ def inference(model, labels):
     logits = []
     targets = []
 
-    cnt_b = 0
     for batch in dataloader:
         data = batch["data"]
         labels = batch["label"]
@@ -14,10 +13,6 @@ def inference(model, labels):
             label = get_label(model, prompt, labels)
             logits.append(str(label))
         targets.extend(labels)
-        cnt_b += 1
-
-        if cnt_b > 4:
-            break
     assert len(logits) == len(targets)
     return logits, targets
 
