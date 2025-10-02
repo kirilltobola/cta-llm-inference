@@ -1,16 +1,18 @@
 from functions import *
+from tqdm import tqdm
 
 
 def inference(model, labels):
     logits = []
     targets = []
+    generator = generate.json(model, ResponseModel)
 
-    for batch in dataloader:
+    for batch in tqdm(dataloader):
         data = batch["data"]
         labels = batch["label"]
         for i in data:
             prompt = create_prompt(i)
-            label = get_label(model, prompt, labels)
+            label = get_label(model, generator, prompt, labels)
             logits.append(str(label))
         targets.extend(labels)
     assert len(logits) == len(targets)

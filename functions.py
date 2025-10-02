@@ -27,8 +27,7 @@ def create_prompt(input_text):
     return prompt
 
 
-def get_label(model, prompt, labels):
-    generator = generate.json(model, ResponseModel)
+def get_label(model, generator, prompt, labels):
     answer = generator(prompt)
     
     # a hallucination occurs
@@ -45,7 +44,7 @@ def read_config(path="config.yaml"):
 
 def get_dataset_dataloader(dataset_path, batch_size):
     dataset = TableDataset(dataset_path)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
     return dataset, dataloader
 
@@ -62,7 +61,7 @@ def load_model(config):
         model_name,
         model_kwargs={
             "quantization_config": quantization_config,
-            "device_map": "auto",
+            "device_map": config["device_map"],
         }
     )
 
