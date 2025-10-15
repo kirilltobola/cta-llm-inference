@@ -1,17 +1,17 @@
 import yaml
 import pandas as pd
-import outlines.models as models
-import outlines.generate as generate
 
 from datetime import datetime
-from torch.utils.data import DataLoader
-from transformers import BitsAndBytesConfig
+
+from vllm import LLM, SamplingParams
+from vllm.sampling_params import StructuredOutputsParams
+from datasets import load_dataset
 
 from response_model import ResponseModel
-from table_dataset import TableDataset
 
 
-def create_prompt(input_text):
+def create_prompt(input_text: str, max_len: int) -> str:
+    input_text = input_text[:max_len]
     sys_message = """System message: Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.
     """
     
@@ -27,52 +27,44 @@ def create_prompt(input_text):
     return prompt
 
 
-def get_label(model, generator, prompt, labels):
-    answer = generator(prompt)
-    
-    # a hallucination occurs
-    if str(answer) not in labels:
-        answer = "hallucination" #random.choice(sem_types)
-    return answer
-
-
 def read_config(path="config.yaml"):
     with open(path, mode="r") as f:
         config = yaml.safe_load(f)
     return config
 
 
-def get_dataset_dataloader(dataset_path, batch_size):
-    dataset = TableDataset(dataset_path)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-
-    return dataset, dataloader
-
-
-def load_model(config):
-    model_name = config["model_name"]
-    quantization_config = None
-    if config["optim"]["use_quantization"]:
-        if config["optim"]["load_in_8bit"]:
-            quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-        elif config["optim"]["load_in_4bit"]:
-            quantization_config = BitsAndBytesConfig(load_in_4bit=True)
-    return models.transformers(
-        model_name,
-        model_kwargs={
-            "quantization_config": quantization_config,
-            "device_map": config["device_map"],
-        }
+def get_sampling_params(config) -> SamplingParams:
+    sampling = config["sampling"]
+    return SamplingParams(
+        temperature=sampling["temperature"], 
+        top_p=sampling["top_p"],
+        max_tokens=sampling["max_tokens"],
+        structured_outputs=StructuredOutputsParams(json=ResponseModel.model_json_schema())
     )
 
 
+def load_model(config) -> LLM:
+    model_name = config["model_name"]
+    optim = config["optim"]
+    return LLM(
+        model=model_name,
+        quantization=optim["quantization"], 
+        max_num_seqs=optim["max_num_seqs"], 
+        max_model_len=optim["max_model_len"],
+        cpu_offload_gb=optim["cpu_offload_gb"],
+        gpu_memory_utilization=optim["gpu_memory_utilization"],
+    )
+
+
+def read_dataset(path: str) -> pd.DataFrame:
+    return pd.DataFrame(load_dataset(path, split="test"))
+
+
 def read_labels(config):
-    return pd.read_csv(
-        config["labels_path"]
-    )[config["labels_column"]].tolist()
+    return pd.read_csv(config["labels_path"])[config["labels_column"]].tolist()
 
 
-def save_results(config, logits, labels):
+def save_results(config, logits: list, labels: list):
     model_short_name = config["model_short_name"]
     infernece_result = pd.DataFrame({
         "logits": logits,
@@ -84,3 +76,5 @@ def save_results(config, logits, labels):
         sep="|",
         index=False
     )
+
+    print("> Job done >>> Exiting...")

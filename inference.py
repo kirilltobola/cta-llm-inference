@@ -1,31 +1,39 @@
-from functions import *
-from tqdm import tqdm
+from vllm import LLM
 
+from functions import get_sampling_params, read_config, read_dataset, create_prompt, load_model, save_results
+from response_model import ResponseModel
 
-def inference(model, labels):
+def inference(config, llm: LLM, prompts: list) -> list:
     logits = []
-    targets = []
-    generator = generate.json(model, ResponseModel)
 
-    for batch in tqdm(dataloader):
-        data = batch["data"]
-        labels = batch["label"]
-        for i in data:
-            prompt = create_prompt(i)
-            label = get_label(model, generator, prompt, labels)
-            logits.append(str(label))
-        targets.extend(labels)
-    assert len(logits) == len(targets)
-    return logits, targets
+    outputs = llm.generate(prompts, get_sampling_params(config))
+    for output in outputs:
+        try:
+            response = ResponseModel.model_validate_json(output.outputs[0].text)
+        except Exception:
+            response = "error"
+        logits.append(str(response).lower())
+    return logits
 
 
 if __name__ == "__main__":
     config = read_config()
 
-    dataset, dataloader = get_dataset_dataloader(
-        config["dataset"]["path"],
-        config["dataloader"]["batch_size"]
-    )
+    dataset = read_dataset(config["dataset"]["path"])
+    data_column = config["dataset"]["data_column"]
+    label_column = config["dataset"]["label_column"]
 
-    logits, labels = inference(load_model(config), read_labels(config))
-    save_results(config, logits, labels)
+    # Sort columns with larger string length.
+    dataset.sort_values(
+        config["dataset"]["data_column"], 
+        ascending=False, 
+        inplace=True,
+        key=lambda x: x.str.len()
+    )
+    
+    prompts = [create_prompt(col, max_len=config["input_text_max_len"]) for col in dataset["column_data"]]
+    llm = load_model(config)
+
+    targets = dataset[label_column].tolist()
+    preds = inference(config, llm, prompts)
+    save_results(config, preds, targets)
