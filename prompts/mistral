@@ -1,0 +1,23 @@
+# https://docs.mistral.ai/cookbooks/concept-deep-dive-tokenization-control_tokens
+System message: Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.
+
+There are a list of russian <len_sem_types> valid types for given input text: <sem_types>.
+
+Your task is to choose only ONE type from the list to annotate the given input. Solve this task by following these steps: 
+1. Choose only one valid type from the given list of types;
+2. Check that the type MUST be in the given list of valid types;
+3. Give the answer in valid JSON format;
+
+Examples:
+Input: [INST] 1962 1970 1980 2002 2006—2008 2010 2015 2015—2016 2019 2011 2023 2024 [/INST]
+Output: [INST] {type: год} [/INST]
+
+Input: [INST] Реал Мадрид Барселона Челси Ливерпуль Локомотив Спартак Зенит Рубин Славия ЦСКА Ростов Галатасарай Манчестер Юнайтед [/INST]
+Output: [INST] {type: команда} [/INST]
+
+Input: [INST] Москва Шанхай Киев Мехико Лондон Мадрид Берлин Париж Пекин Бангкок Токио Дели Сан-Паулу Джакарта Мумбаи Стамбул Дубай Рим Нью-Йорк [/INST]
+Output: [INST] {type: город} [/INST]
+
+Annotate input:
+Input: [INST] <input_text> [/INST]
+Output: [INST] 

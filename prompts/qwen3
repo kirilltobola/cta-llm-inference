@@ -1,0 +1,30 @@
+# https://qwen.readthedocs.io/en/latest/getting_started/concepts.html ; https://docs.unsloth.ai/models/qwen3-how-to-run-and-fine-tune
+System message: Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.
+
+There are a list of russian <len_sem_types> valid types for given input text: <sem_types>.
+
+Your task is to choose only ONE type from the list to annotate the given input. Solve this task by following these steps: 
+1. Choose only one valid type from the given list of types;
+2. Check that the type MUST be in the given list of valid types; 
+3. Give the answer in valid JSON format;
+
+Examples:
+Input: <|im_start|>user
+1962 1970 1980 2002 2006—2008 2010 2015 2015—2016 2019 2011 2023 2024 <|im_end|>
+Output: <|im_start|>assistant
+{type: год} <|im_end|>
+
+Input: <|im_start|>user
+Москва Шанхай Киев Мехико Лондон Мадрид Берлин Париж Пекин Бангкок Токио Дели Сан-Паулу Джакарта Мумбаи Стамбул Дубай Рим Нью-Йорк <|im_end|>
+Output: <|im_start|>assistant
+{type: город} <|im_end|>
+
+Input: <|im_start|>user
+Реал Мадрид Барселона Челси Ливерпуль Локомотив Спартак Зенит Рубин Славия ЦСКА Ростов Галатасарай Манчестер Юнайтед <|im_end|>
+Output: <|im_start|>assistant
+{type: команда} <|im_end|>
+
+Annotate input:
+Input: <|im_start|>user
+<input_text> <|im_end|>
+Output: <|im_start|>assistant \no_think

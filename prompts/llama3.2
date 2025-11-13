@@ -1,0 +1,34 @@
+# https://inside-machinelearning.com/en/special-tokens/
+<|begin_of_text|>
+<|start_header_id|>system<|end_header_id|>
+Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.<|eot_id|>
+
+There are a list of russian <len_sem_types> valid types for given input text: <sem_types>.
+
+Your task is to choose only ONE type from the list to annotate the given input. 
+
+Solve this task by following these steps: 
+1. Choose only one valid type from the given list of types; 
+2. Check that the type MUST be in the given list of valid types;
+3. Give the answer in valid JSON format;
+
+Examples:
+Input: <|start_header_id|>user<|end_header_id|>
+1962 1970 1980 2002 2006—2008 2010 2015 2015—2016 2019 2011 2023 2024<|eot_id|>
+Output: <|start_header_id|>assistant<|end_header_id|>
+{type: год} <|eot_id|>
+
+Input: <|start_header_id|>user<|end_header_id|>
+Реал Мадрид Барселона Челси Ливерпуль Локомотив Спартак Зенит Рубин Славия ЦСКА Ростов Галатасарай Манчестер Юнайтед<|eot_id|>
+Output: <|start_header_id|>assistant<|end_header_id|>
+{type: команда} <|eot_id|>
+
+Input: <|start_header_id|>user<|end_header_id|>
+Москва Шанхай Киев Мехико Лондон Мадрид Берлин Париж Пекин Бангкок Токио Дели Сан-Паулу Джакарта Мумбаи Стамбул Дубай Рим Нью-Йорк<|eot_id|>
+Output: <|start_header_id|>assistant<|end_header_id|>
+{type: город} <|eot_id|>
+
+Annotate input:
+Input: <|start_header_id|>user<|end_header_id|>
+<input_text><|eot_id|>
+Output: <|start_header_id|>assistant<|end_header_id|>
