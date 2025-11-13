@@ -1,0 +1,12 @@
+---
+# HF / ModelScope model name.
+model_name: "Vikhrmodels/Vistral-24B-Instruct"
+
+# model short name, avoid `/` symbols.
+model_short_name: "vistral-24b-it-fs"
+
+# token level limit / default 131072
+max_model_len: 131072
+
+quantization: null
+

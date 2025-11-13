@@ -1,0 +1,11 @@
+---
+# HF / ModelScope model name.
+model_name: "Vikhrmodels/Vikhr-Llama-3.2-1B-Instruct"
+
+# model short name, avoid `/` symbols.
+model_short_name: "llama-3.2-3b-it-fs"
+
+# token level limit / default 128k
+max_model_len: 128000 
+
+quantization: null

@@ -1,0 +1,11 @@
+---
+# HF / ModelScope / local model name.
+model_name: "Vikhrmodels/QVikhr-3-4B-Instruction"
+
+# model short name, avoid `/` symbols.
+model_short_name: "qvikhr3-4b-it-fs"
+
+# token level limit / default 40960 
+max_model_len: 40960
+
+quantization: null
