@@ -10,20 +10,29 @@ from datasets import load_dataset
 from response_model import ResponseModel
 
 
-def create_prompt(input_text: str, max_len: int) -> str:
-    input_text = input_text[:max_len]
-    sys_message = """System message: Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.
-    """
-    
-    usr_message = f"""User message: Consider input text is: {input_text}
-    
-    There are a list of russian 170 valid types for given input text: авиакомпания, автомобиль, адрес, актер, альбом, аннотация, арена, атлет, аэропорт, база, банк, боксер, борец, ввп, ведущий, вес, вещество, владелец, возраст, высота, гимнаст, глубина, год, гонка, город, группа, дата, двигатель, день, директор, документ, дорога, жанр, животное, журнал, закон, звук, здание, игра, идентификатор, идеология, издатель, изображение, инструмент, камера, канал, категория, класс, классификация, клуб, книга, код, количество, колледж, команда, компания, компонент, континент, конькобежец, корабль, кратер, лейбл, лес, лига, локомотив, марка, место, местонахождение, модель, мотоцикл, музей, муниципалитет, награда, название, население, национальность, область, образование, опера, оператор, описание, организация, остров, отель, отношение, партия, партнер, период, персона, персонаж, песня, пилот, площадь, поезд, позиция, пол, порт, порядок, правительство, премия, префектура, примечание, провинция, программа, продолжительность, продукт, продюсер, проект, производитель, происхождение, пьеса, работа, работодатель, размер, район, ракета, ранг, расстояние, результат, река, религия, роман, сайт, самолет, символ, сингл, служба, событие, создатель, сообщество, состояние, спорт, спортсмен, ссылка, стадион, стандарт, станция, статистика, статус, статья, столица, страна, структура, судья, сценарист, театр, теннисист, территория, техника, тип, транспорт, требование, трек, тренер, турнир, улица, университет, устройство, фигурист, фильм, фирма, флаг, формат, футболист, художник, цвет, цитата, шахматист, элемент, язык.
-    
-    Your task is to choose only ONE type from the list to annotate the given input text.
-    
-    [INST]Solve this task by following these steps: 1. Choose only one valid type from the given list of types. 2. Check that the type MUST be in the given list of valid types. 3. Give the answer in valid JSON format.[/INST]"""
+def set_determinism(seed: int):
+    import random
+    import numpy as np
+    import torch
 
-    prompt = sys_message + usr_message
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed) # If using CUDA
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False # Setting benchmark to False can also help ensure determinism
+
+
+def create_prompt(model_name: str, input_text: str, max_len: int, sem_types: str, len_sem_types: int) -> str:
+    input_text = input_text[:max_len]
+    with open(f"prompts/{model_name}", "r") as f:
+        prompt = f.readlines()
+    
+    prompt = "".join(prompt[1:])
+    prompt = prompt.replace("<input_text>", input_text)
+    prompt = prompt.replace("<sem_types>", sem_types)
+    prompt = prompt.replace("<len_sem_types>", str(len_sem_types))
     return prompt
 
 
@@ -36,23 +45,21 @@ def read_config(path="config.yaml"):
 def get_sampling_params(config) -> SamplingParams:
     sampling = config["sampling"]
     return SamplingParams(
-        temperature=sampling["temperature"], 
-        top_p=sampling["top_p"],
-        max_tokens=sampling["max_tokens"],
+        **sampling,
         structured_outputs=StructuredOutputsParams(json=ResponseModel.model_json_schema())
     )
 
 
-def load_model(config) -> LLM:
-    model_name = config["model_name"]
-    optim = config["optim"]
+def load_model(config, model_config) -> LLM:
     return LLM(
-        model=model_name,
-        quantization=optim["quantization"], 
-        max_num_seqs=optim["max_num_seqs"], 
-        max_model_len=optim["max_model_len"],
-        cpu_offload_gb=optim["cpu_offload_gb"],
-        gpu_memory_utilization=optim["gpu_memory_utilization"],
+        model=model_config["model_name"],
+        tokenizer=model_config["model_name"],
+        quantization=model_config["quantization"], 
+        max_model_len=model_config["max_model_len"],
+        max_num_seqs=config["optim"]["max_num_seqs"], 
+        cpu_offload_gb=config["optim"]["cpu_offload_gb"],
+        gpu_memory_utilization=config["optim"]["gpu_memory_utilization"],
+        trust_remote_code=True
     )
 
 
@@ -64,8 +71,8 @@ def read_labels(config):
     return pd.read_csv(config["labels_path"])[config["labels_column"]].tolist()
 
 
-def save_results(config, logits: list, labels: list):
-    model_short_name = config["model_short_name"]
+def save_results(model_config, logits: list, labels: list):
+    model_short_name = model_config["model_short_name"]
     infernece_result = pd.DataFrame({
         "logits": logits,
         "labels": labels
@@ -76,5 +83,4 @@ def save_results(config, logits: list, labels: list):
         sep="|",
         index=False
     )
-
     print("> Job done >>> Exiting...")

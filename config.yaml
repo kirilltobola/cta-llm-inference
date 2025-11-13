@@ -1,13 +1,9 @@
 ---
-model_name: "Qwen/Qwen2.5-3B-Instruct-AWQ" # HF model name.
-model_short_name: "qwen25awq" # to save inference resluts, avoid `/` symbols.
+# "gemma" "llama3.2", "qwen3", "mistral"
+model: "gemma"
 
-input_text_max_len: 1000 # max length for input text (column).
-
-sampling:
-  max_tokens: 50
-  temperature: 0.8
-  top_p: 0.95
+# max length for input text (column) / default 512
+input_text_max_len: 512
 
 labels_path: "sem_types.csv"
 labels_column: "label"
@@ -18,9 +14,14 @@ dataset:
   label_column: "label"
   split: "test"
 
+# Deterministic output
+sampling:
+  max_tokens: 20
+  temperature: 0.0
+  top_p: 1.0
+  top_k: 0
+
 optim:
-  quantization: "awq" # depends on model's quantization support.
   max_num_seqs: 256 # process at most 256 sequences per forward pass.
-  max_model_len: 10000 # token level limit.
   cpu_offload_gb: 0 # if gpu memory not enough.
-  gpu_memory_utilization: 0.85 # from 0.0 to 1.0 / default 0.9.
+  gpu_memory_utilization: 0.9 # from 0.0 to 1.0 / default 0.9.
