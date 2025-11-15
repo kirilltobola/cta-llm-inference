@@ -10,3 +10,11 @@ max_model_len: 131072
 
 quantization: null
 
+render_rules:
+  "<bos>": ""
+  "<sys_id>": "System message: "
+  "<sys_end>": ""
+  "<user_turn>": "[INST] "
+  "<model_turn>": "[INST] "
+  "<last_model_turn>": "[INST] "
+  "<end_turn>": " [/INST]"

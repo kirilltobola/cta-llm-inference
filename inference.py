@@ -1,7 +1,8 @@
 import pandas as pd
 from vllm import LLM
 
-from functions import get_sampling_params, read_config, read_dataset, create_prompt, load_model, save_results, set_determinism
+from functions import get_sampling_params, read_config, read_dataset, load_model, save_results, set_determinism, truncate_input_to_n_words
+from prompts.prompt_renderer import PromptRenderer
 from response_model import ResponseModel
 
 def inference(config, llm: LLM, prompts: list) -> list:
@@ -18,9 +19,10 @@ def inference(config, llm: LLM, prompts: list) -> list:
 
 
 if __name__ == "__main__":
-    set_determinism(seed=42)
-
     config = read_config()
+    model_config = read_config(f"model_config/{config['model']}.yaml")
+
+    set_determinism(seed=config["seed"])
 
     dataset = read_dataset(config["dataset"]["path"])
     data_column = config["dataset"]["data_column"]
@@ -34,13 +36,18 @@ if __name__ == "__main__":
         key=lambda x: x.str.len()
     )
     targets = dataset[label_column].tolist()
-    sem_types = pd.read_csv("sem_types.csv")["label"].tolist()
     
-    model_config = read_config(f"model_config/{config['model']}.yaml")
+    renderer = PromptRenderer(
+        "prompts/unified_prompt",
+        config["model"],
+        model_config["render_rules"]
+    )
+    renderer.pre_render(pd.read_csv("sem_types.csv")["label"].tolist())
     prompts = [
-        create_prompt(config["model"], col, config["input_text_max_len"], ", ".join(sem_types), len(sem_types)) 
-        for col in dataset["column_data"]
+        renderer.render(truncate_input_to_n_words(input, n=config["input_text_max_len"]))
+        for input in dataset["column_data"]
     ]
+
     llm = load_model(config, model_config)
     preds = inference(config, llm, prompts)
     save_results(model_config, preds, targets)

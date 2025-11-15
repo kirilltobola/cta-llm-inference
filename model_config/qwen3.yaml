@@ -9,3 +9,12 @@ model_short_name: "qvikhr3-4b-it-fs"
 max_model_len: 40960
 
 quantization: null
+
+render_rules:
+  "<bos>": ""
+  "<sys_id>": "System message: "
+  "<sys_end>": ""
+  "<user_turn>": "<|im_start|>user\n"
+  "<model_turn>": "<|im_start|>assistant\n"
+  "<last_model_turn>": "<|im_start|>assistant \no_think"
+  "<end_turn>": " <|im_end|>"

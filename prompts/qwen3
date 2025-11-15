@@ -1,11 +1,12 @@
-# https://qwen.readthedocs.io/en/latest/getting_started/concepts.html ; https://docs.unsloth.ai/models/qwen3-how-to-run-and-fine-tune
 System message: Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.
 
-There are a list of russian <len_sem_types> valid types for given input text: <sem_types>.
+There are a list of russian 170 valid types for given input text: авиакомпания, автомобиль, адрес, актер, альбом, аннотация, арена, атлет, аэропорт, база, банк, боксер, борец, ввп, ведущий, вес, вещество, владелец, возраст, высота, гимнаст, глубина, год, гонка, город, группа, дата, двигатель, день, директор, документ, дорога, жанр, животное, журнал, закон, звук, здание, игра, идентификатор, идеология, издатель, изображение, инструмент, камера, канал, категория, класс, классификация, клуб, книга, код, количество, колледж, команда, компания, компонент, континент, конькобежец, корабль, кратер, лейбл, лес, лига, локомотив, марка, место, местонахождение, модель, мотоцикл, музей, муниципалитет, награда, название, население, национальность, область, образование, опера, оператор, описание, организация, остров, отель, отношение, партия, партнер, период, персона, персонаж, песня, пилот, площадь, поезд, позиция, пол, порт, порядок, правительство, премия, префектура, примечание, провинция, программа, продолжительность, продукт, продюсер, проект, производитель, происхождение, пьеса, работа, работодатель, размер, район, ракета, ранг, расстояние, результат, река, религия, роман, сайт, самолет, символ, сингл, служба, событие, создатель, сообщество, состояние, спорт, спортсмен, ссылка, стадион, стандарт, станция, статистика, статус, статья, столица, страна, структура, судья, сценарист, театр, теннисист, территория, техника, тип, транспорт, требование, трек, тренер, турнир, улица, университет, устройство, фигурист, фильм, фирма, флаг, формат, футболист, художник, цвет, цитата, шахматист, элемент, язык.
 
-Your task is to choose only ONE type from the list to annotate the given input. Solve this task by following these steps: 
+Your task is to choose only ONE type from the list to annotate the given input.
+
+Solve this task by following these steps:
 1. Choose only one valid type from the given list of types;
-2. Check that the type MUST be in the given list of valid types; 
+2. Check that the type MUST be in the given list of valid types;
 3. Give the answer in valid JSON format;
 
 Examples:
@@ -15,14 +16,14 @@ Output: <|im_start|>assistant
 {type: год} <|im_end|>
 
 Input: <|im_start|>user
-Москва Шанхай Киев Мехико Лондон Мадрид Берлин Париж Пекин Бангкок Токио Дели Сан-Паулу Джакарта Мумбаи Стамбул Дубай Рим Нью-Йорк <|im_end|>
-Output: <|im_start|>assistant
-{type: город} <|im_end|>
-
-Input: <|im_start|>user
 Реал Мадрид Барселона Челси Ливерпуль Локомотив Спартак Зенит Рубин Славия ЦСКА Ростов Галатасарай Манчестер Юнайтед <|im_end|>
 Output: <|im_start|>assistant
 {type: команда} <|im_end|>
+
+Input: <|im_start|>user
+Москва Шанхай Киев Мехико Лондон Мадрид Берлин Париж Пекин Бангкок Токио Дели Сан-Паулу Джакарта Мумбаи Стамбул Дубай Рим Нью-Йорк <|im_end|>
+Output: <|im_start|>assistant
+{type: город} <|im_end|>
 
 Annotate input:
 Input: <|im_start|>user

@@ -24,16 +24,17 @@ def set_determinism(seed: int):
     torch.backends.cudnn.benchmark = False # Setting benchmark to False can also help ensure determinism
 
 
-def create_prompt(model_name: str, input_text: str, max_len: int, sem_types: str, len_sem_types: int) -> str:
-    input_text = input_text[:max_len]
-    with open(f"prompts/{model_name}", "r") as f:
-        prompt = f.readlines()
-    
-    prompt = "".join(prompt[1:])
-    prompt = prompt.replace("<input_text>", input_text)
-    prompt = prompt.replace("<sem_types>", sem_types)
-    prompt = prompt.replace("<len_sem_types>", str(len_sem_types))
-    return prompt
+def truncate_input_to_n_words(input: str, n: int):
+    input_lenght = len(input)
+    cnt = 0
+    space_idx = 0
+    for i in range(space_idx, input_lenght):
+        if input[i].isspace() or i == input_lenght-1:
+            cnt += 1
+            space_idx = i
+        if cnt >= n:
+            break
+    return input[:space_idx + 1]
 
 
 def read_config(path="config.yaml"):

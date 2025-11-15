@@ -9,3 +9,12 @@ model_short_name: "vigemma-2b-it-fs"
 max_model_len: 8192
 
 quantization: null
+
+render_rules:
+  "<bos>": "<bos>"
+  "<sys_id>": "System message: "
+  "<sys_end>": ""
+  "<user_turn>": "<start_of_turn>user\n"
+  "<model_turn>": "<start_of_turn>model\n"
+  "<last_model_turn>": "<start_of_turn>model"
+  "<end_turn>": " <end_of_turn>"

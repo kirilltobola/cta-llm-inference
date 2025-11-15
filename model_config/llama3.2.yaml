@@ -9,3 +9,12 @@ model_short_name: "llama-3.2-3b-it-fs"
 max_model_len: 128000 
 
 quantization: null
+
+render_rules:
+  "<bos>": "<|begin_of_text|>\n"
+  "<sys_id>": "<|start_header_id|>system<|end_header_id|>\n"
+  "<sys_end>": " <|eot_id|>"
+  "<user_turn>": "<|start_header_id|>user<|end_header_id|>\n"
+  "<model_turn>": "<|start_header_id|>assistant<|end_header_id|>\n"
+  "<last_model_turn>": "<|start_header_id|>assistant<|end_header_id|>"
+  "<end_turn>": " <|eot_id|>"

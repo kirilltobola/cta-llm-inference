@@ -2,7 +2,9 @@
 # "gemma" "llama3.2", "qwen3", "mistral"
 model: "gemma"
 
-# max length for input text (column) / default 512
+seed: 42
+
+# max length for input text (words) / default 512
 input_text_max_len: 512
 
 labels_path: "sem_types.csv"
