@@ -1,3 +1,6 @@
+import random
+import numpy as np
+import torch
 import yaml
 import pandas as pd
 
@@ -6,6 +9,7 @@ from datetime import datetime
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import StructuredOutputsParams
 from datasets import load_dataset
+from torcheval.metrics.functional import multiclass_f1_score
 
 from response_model import ResponseModel
 
@@ -72,16 +76,45 @@ def read_labels(config):
     return pd.read_csv(config["labels_path"])[config["labels_column"]].tolist()
 
 
-def save_results(model_config, suffix: str, logits: list, labels: list):
+def save_results(model_config, suffix: str, logits: list, labels: list) -> str:
     model_short_name = model_config["model_short_name"]
     infernece_result = pd.DataFrame({
         "logits": logits,
         "labels": labels
     })
 
+    filename = f"results/{model_short_name}-{suffix}-{datetime.now():%Y-%m-%d %H:%M:%S}.csv"
     infernece_result.to_csv(
-        f"results/{model_short_name}-{suffix}-{datetime.now():%Y-%m-%d %H:%M:%S}.csv",
+        filename,
         sep="|",
         index=False
     )
-    print("> Job done >>> Exiting...")
+    return filename
+
+
+def get_inference_score(filename: str, labels_filename: str, labels_column: str, num_tests: int) -> None:
+    sem_types = pd.read_csv(labels_filename)[labels_column].tolist()
+    sem_types_dict = {}
+    for i in range(len(sem_types)):
+        sem_types_dict[sem_types[i]] = i
+    sem_types_dict
+
+    df = pd.read_csv(filename, sep="|")
+    preds = df["logits"].tolist()
+    labels = df["labels"].tolist()
+
+    tests = np.array([0 for _ in range(num_tests)], dtype=float)
+    for i in range(num_tests):
+        preds_map = list(map(lambda x: sem_types_dict.get(x, random.randint(0, len(sem_types) - 1)), preds))
+        preds_tensor = torch.tensor(preds_map, dtype=torch.float32)
+        labels_map = list(map(lambda x: sem_types_dict[x], labels))
+        labels_tensor = torch.tensor(labels_map, dtype=torch.float32)
+
+        score = multiclass_f1_score(
+            preds_tensor,
+            labels_tensor,
+            num_classes=len(sem_types),
+            average="micro"
+        )
+        tests[i] = score.numpy()
+    print(f"<< \n < Inference score: min = {tests.min():.4f} / mean = {tests.mean():.4f} / max = {tests.max():.4f}")

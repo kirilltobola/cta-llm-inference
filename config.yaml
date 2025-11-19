@@ -2,6 +2,7 @@
 # "gemma" "llama3.2", "qwen3", "mistral"
 model: "gemma"
 
+# ru/eng-zero/one/few-shot
 prompt: "prompts/ru-few-shot"
 
 seed: 42

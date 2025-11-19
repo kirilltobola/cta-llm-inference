@@ -1,7 +1,7 @@
 import pandas as pd
 from vllm import LLM
 
-from functions import get_sampling_params, read_config, read_dataset, load_model, save_results, set_determinism, truncate_input_to_n_words
+from functions import get_inference_score, get_sampling_params, read_config, read_dataset, load_model, save_results, set_determinism, truncate_input_to_n_words
 from prompts.prompt_renderer import PromptRenderer
 from response_model import ResponseModel
 
@@ -52,4 +52,6 @@ if __name__ == "__main__":
     llm = load_model(config, model_config)
     preds = inference(config, llm, prompts)
     suffix = prompt_filename.split("/")[-1]
-    save_results(model_config, suffix, preds, targets)
+    inference_filename = save_results(model_config, suffix, preds, targets)
+
+    get_inference_score(inference_filename, config["labels_path"], config["labels_column"], num_tests=100)
