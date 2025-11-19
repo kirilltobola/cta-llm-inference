@@ -1,0 +1,14 @@
+<bos><sys_id>Be a helpful, accurate assistant for data discovery and exploration desiged to output valid JSON.<sys_end>
+
+There are a list of russian <len_labels> valid types for given input text: <labels>.
+
+Your task is to choose only ONE type from the list to annotate the given input.
+
+Solve this task by following these steps:
+1. Choose only one valid type from the given list of types;
+2. Check that the type MUST be in the given list of valid types;
+3. Give the answer in valid JSON format;
+
+Annotate input:
+Input: <user_turn><input_text><end_turn>
+Output: <last_model_turn>

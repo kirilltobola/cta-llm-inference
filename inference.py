@@ -37,8 +37,9 @@ if __name__ == "__main__":
     )
     targets = dataset[label_column].tolist()
     
+    prompt_filename = config["prompt"]
     renderer = PromptRenderer(
-        "prompts/unified_prompt",
+        prompt_filename,
         config["model"],
         model_config["render_rules"]
     )
@@ -50,4 +51,5 @@ if __name__ == "__main__":
 
     llm = load_model(config, model_config)
     preds = inference(config, llm, prompts)
-    save_results(model_config, preds, targets)
+    suffix = prompt_filename.split("/")[-1]
+    save_results(model_config, suffix, preds, targets)

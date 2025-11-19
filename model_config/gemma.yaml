@@ -3,7 +3,7 @@
 model_name: "Vikhrmodels/Vikhr-Gemma-2B-instruct"
 
 # model short name, avoid `/` symbols.
-model_short_name: "vigemma-2b-it-fs"
+model_short_name: "vigemma-2b-it"
 
 # token level limit / default 8192
 max_model_len: 8192

@@ -72,7 +72,7 @@ def read_labels(config):
     return pd.read_csv(config["labels_path"])[config["labels_column"]].tolist()
 
 
-def save_results(model_config, logits: list, labels: list):
+def save_results(model_config, suffix: str, logits: list, labels: list):
     model_short_name = model_config["model_short_name"]
     infernece_result = pd.DataFrame({
         "logits": logits,
@@ -80,7 +80,7 @@ def save_results(model_config, logits: list, labels: list):
     })
 
     infernece_result.to_csv(
-        f"results/{model_short_name}-inference-results-{datetime.now():%Y-%m-%d %H:%M:%S}.csv",
+        f"results/{model_short_name}-{suffix}-{datetime.now():%Y-%m-%d %H:%M:%S}.csv",
         sep="|",
         index=False
     )

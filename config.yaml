@@ -2,6 +2,8 @@
 # "gemma" "llama3.2", "qwen3", "mistral"
 model: "gemma"
 
+prompt: "prompts/ru-few-shot"
+
 seed: 42
 
 # max length for input text (words) / default 512
