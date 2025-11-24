@@ -54,4 +54,10 @@ if __name__ == "__main__":
     suffix = prompt_filename.split("/")[-1]
     inference_filename = save_results(model_config, suffix, preds, targets)
 
-    get_inference_score(inference_filename, config["labels_path"], config["labels_column"], num_tests=100)
+    get_inference_score(
+        inference_filename, 
+        config["labels_path"], 
+        config["labels_column"], 
+        config["inference_score"]["n_tests"],
+        config["inference_score"]["average"]
+    )

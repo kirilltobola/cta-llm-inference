@@ -92,7 +92,7 @@ def save_results(model_config, suffix: str, logits: list, labels: list) -> str:
     return filename
 
 
-def get_inference_score(filename: str, labels_filename: str, labels_column: str, num_tests: int) -> None:
+def get_inference_score(filename: str, labels_filename: str, labels_column: str, num_tests: int, average_list: list[str]) -> None:
     sem_types = pd.read_csv(labels_filename)[labels_column].tolist()
     sem_types_dict = {}
     for i in range(len(sem_types)):
@@ -104,17 +104,18 @@ def get_inference_score(filename: str, labels_filename: str, labels_column: str,
     labels = df["labels"].tolist()
 
     tests = np.array([0 for _ in range(num_tests)], dtype=float)
-    for i in range(num_tests):
-        preds_map = list(map(lambda x: sem_types_dict.get(x, random.randint(0, len(sem_types) - 1)), preds))
-        preds_tensor = torch.tensor(preds_map, dtype=torch.float32)
-        labels_map = list(map(lambda x: sem_types_dict[x], labels))
-        labels_tensor = torch.tensor(labels_map, dtype=torch.float32)
+    for average in average_list:
+        for i in range(num_tests):
+            preds_map = list(map(lambda x: sem_types_dict.get(x, random.randint(0, len(sem_types) - 1)), preds))
+            preds_tensor = torch.tensor(preds_map, dtype=torch.int64)
+            labels_map = list(map(lambda x: sem_types_dict[x], labels))
+            labels_tensor = torch.tensor(labels_map, dtype=torch.int64)
 
-        score = multiclass_f1_score(
-            preds_tensor,
-            labels_tensor,
-            num_classes=len(sem_types),
-            average="micro"
-        )
-        tests[i] = score.numpy()
-    print(f"<< \n < Inference score: min = {tests.min():.4f} / mean = {tests.mean():.4f} / max = {tests.max():.4f}")
+            score = multiclass_f1_score(
+                preds_tensor,
+                labels_tensor,
+                num_classes=len(sem_types),
+                average=average
+            )
+            tests[i] = score.numpy()
+        print(f"<< \n < Inference score ({average}): min = {tests.min():.4f} / mean = {tests.mean():.4f} / max = {tests.max():.4f}")

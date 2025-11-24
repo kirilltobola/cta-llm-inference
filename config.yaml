@@ -30,3 +30,7 @@ optim:
   max_num_seqs: 256 # process at most 256 sequences per forward pass.
   cpu_offload_gb: 0 # if gpu memory not enough.
   gpu_memory_utilization: 0.9 # from 0.0 to 1.0 / default 0.9.
+
+inference_score:
+  n_tests: 100
+  average: ["micro", "macro", "weighted"]
