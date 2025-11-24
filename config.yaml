@@ -1,5 +1,5 @@
 ---
-# "gemma" "llama3.2", "qwen3", "mistral"
+# "gemma", "llama3.2", "llama3.2", "qwen3", "qwen25", "mistral"
 model: "gemma"
 
 # ru/eng-zero/one/few-shot

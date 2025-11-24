@@ -1,0 +1,20 @@
+---
+# HF / ModelScope / local model name.
+model_name: "Qwen/Qwen2.5-32B-Instruct-AWQ"
+
+# model short name, avoid `/` symbols.
+model_short_name: "qwen2.5-32b-awq-it"
+
+# token level limit / default 32768
+max_model_len: 32768
+
+quantization: "awq"
+
+render_rules:
+  "<bos>": ""
+  "<sys_id>": "System message: "
+  "<sys_end>": ""
+  "<user_turn>": "<|im_start|>user\n"
+  "<model_turn>": "<|im_start|>assistant\n"
+  "<last_model_turn>": "<|im_start|>assistant"
+  "<end_turn>": " <|im_end|>"
